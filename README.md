@@ -12,6 +12,7 @@ a skill for managing [Greenbone Community Edition (OpenVAS)](https://github.com/
 
 ## Installation
 
+- for human, install by running:
 ```bash
 npx skills add 100vision/openvas-cli
 ```
