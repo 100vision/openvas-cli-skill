@@ -1,6 +1,6 @@
-# openvas-cli Skill for OpenCode
+# openvas-cli Skill 
 
-OpenCode skill for managing [Greenbone Community Edition (OpenVAS)](https://github.com/greenbone/openvas) vulnerability scanners remotely via CLI.
+a skill for managing [Greenbone Community Edition (OpenVAS)](https://github.com/greenbone/openvas) vulnerability scanners remotely via CLI.
 
 ## Features
 
@@ -12,35 +12,16 @@ OpenCode skill for managing [Greenbone Community Edition (OpenVAS)](https://gith
 
 ## Installation
 
-### Method 1: Direct `.skill` file (recommended)
-
-Download `openvas-cli.skill` and install:
-
 ```bash
-mkdir -p ~/.config/opencode/skills/openvas-cli
-unzip openvas-cli.skill -d ~/.config/opencode/skills/
+npx skills add 100vision/openvas-cli
 ```
 
-### Method 2: Clone this repo
 
-```bash
-mkdir -p ~/.config/opencode/skills
-git clone https://github.com/YOUR_USERNAME/openvas-cli-skill.git
-cp -r openvas-cli-skill/openvas-cli ~/.config/opencode/skills/
-```
 
-### Method 3: Project-local (only available in current project)
 
-```bash
-mkdir -p .opencode/skills
-cp -r openvas-cli .opencode/skills/
-```
+## Skill Usage Examples
 
-After installation, restart OpenCode. The skill will auto-trigger when you mention OpenVAS, Greenbone, vulnerability scanning, or related topics.
-
-## Usage Examples
-
-### Install & Setup
+### CLI Install & Setup
 
 > 帮我装一下 openvas-cli，我要连远程的 Greenbone 扫描器
 
