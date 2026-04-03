@@ -5,12 +5,19 @@ description: Manage Greenbone Community Edition (OpenVAS) vulnerability scanners
 
 # openvas-cli Skill
 
-Manage Greenbone Community Edition (OpenVAS) instances from a remote workstation using `openvas-cli`, a Python wrapper around `gvm-cli`.
+This skill enables an AI agent to manage Greenbone Community Edition (OpenVAS) instances from a remote workstation using `openvas-cli`, a Python wrapper around `gvm-cli`.
 
 ## Architecture
 
 ```
-remote workstation (openvas-cli) → local SSH → remote gvm-cli socket → remote gvmd socket
+#Option 1 : if through a direct ssh connection:
+remote workstation(openvas-cli/ai agent)   ──SSH:22──▶  openvas-host  ──▶  gvm-cli socket  ──▶  gvmd.sock
+
+#Option 2 : if OpenVAS is not directly reachable and network path must go through a ssh jump host:
+  remote workstation(openvas-cli/ai agent)  ──SSH:22──▶  jump-host  ══tunnel══▶  openvas-host:22
+       │                                                 ▲
+       └──SSH to localhost:LOCAL_PORT────────────────────┘
+           (existing commands see this as a direct connection)
 ```
 
 The default transport is **SSH**, which tunnels `gvm-cli socket` commands to a remote OpenVAS host. This is specifically designed for Greenbone Community Edition where `gvm-cli ssh` is not available.
@@ -55,26 +62,25 @@ openvas-cli --help
 
 ## Onboarding
 
-Run `openvas-cli onboard` to configure the connection. In SSH mode this:
+for first-run , you must to run `openvas-cli onboard` to configure the connection to the OpenVAS host you want to manage. 
+you could instruct your AI agent to set this up for you or manually do it yourself.
 
-1. Asks for remote OpenVAS host, port, and SSH username
+
+The onboarding basically does these things:
+
+1. Asks for remote OpenVAS host, ssh port, and SSH username and ssh jumphost/bastion information if selected. 
 2. Generates a local SSH keypair if missing (`~/.ssh/openvas_cli_ed25519`)
 3. Adds the remote host to `~/.ssh/known_hosts`
-4. Prompts once for the SSH password
-5. Installs the public key into the remote user's `~/.ssh/authorized_keys`
-6. Stores all config in `~/.config/openvas-cli/openvas-cli.conf`
+4. Installs the public key into the remote user's `~/.ssh/authorized_keys`
+5. Stores all config in `~/.config/openvas-cli/openvas-cli.conf`
 
-Config file permissions are set to `600`. Re-run with `--force` to rewrite config when settings change.
+>Note:
+>Config file permissions are set to `600`. Re-run with `--force` to rewrite config when settings change.
 
-## Transport Selection
 
-| Transport | Use Case |
-|-----------|----------|
-| `ssh` (default) | Greenbone Community Edition remote access |
-| `socket` | Running locally on the same host as `gvmd` |
-| `tls` | GMP over TLS explicitly configured on server |
+>Note:
+> if using a ssh jumphost/bastion,make sure to use the same ssh user on both jumphost/basion and your OpenVAS host. Otherwise ssh tunnels may not be established.
 
-Prefer `ssh` for remote access, `socket` for local execution.
 
 ## Verification Flow
 
@@ -97,7 +103,7 @@ For detailed command patterns, see `references/commands.md`.
 ### Discover Resources
 
 ```bash
-openvas-cli config list
+openvas-cli config list 
 openvas-cli scanner list
 openvas-cli credential list
 openvas-cli task list
@@ -155,8 +161,9 @@ For detailed troubleshooting, see `references/troubleshooting.md`.
 1. Remote SSH login works
 2. Remote `gvm-cli` exists
 3. Remote socket path is correct
-4. Remote user can access the socket (must be member of `_gvm` group)
-5. GMP credentials are correct
+4. OpenVVAS services are up and running. if not,run `sudo gvm-start`
+5. Remote ssh user has right to access the socket (must be member of `_gvm` group on OpenVAS instance)
+6. GMP credentials are correct
 
 ### Common Q&A
 
